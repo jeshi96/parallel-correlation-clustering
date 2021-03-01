@@ -125,7 +125,7 @@ message CorrelationClustererConfig {
     LOUVAIN = 1;
   }
   optional ClusteringMovesMethod clustering_moves_method = 9
-      [default = DEFAULT_CLUSTER_MOVES];
+      [default = LOUVAIN];
   
   enum SubclusteringMethod {
     NONE_SUBCLUSTERING = 0;
