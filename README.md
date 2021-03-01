@@ -38,8 +38,8 @@ applies. In particular, to compile benchmarks for graphs with
 more than 2^32 edges, the `LONG` command-line parameter should be set.
 
 Also, the parallel scheduler can be chosen using comand-line parameters.
-The default compilation is serial, and the parameters HOMEGROWN, CILK, and
-OPENMP switch between the Homegrown scheduler, Cilk Plus, and OpenMP
+The default compilation is the ParlayLib scheduler (Homegrown), and the parameters HOMEGROWN, CILK, 
+OPENMP, and SERIAL switch between the Homegrown scheduler, Cilk Plus, OpenMP, and serial
 respectively.
 
 ### Graph Format
