@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-ifndef PARALLEL_CLUSTERING_CLUSTERERS_PARALLEL_MODULARITY_CLUSTERER_H_
+#ifndef PARALLEL_CLUSTERING_CLUSTERERS_PARALLEL_MODULARITY_CLUSTERER_H_
 #define PARALLEL_CLUSTERING_CLUSTERERS_PARALLEL_MODULARITY_CLUSTERER_H_
 
 #include <algorithm>
