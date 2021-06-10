@@ -160,6 +160,8 @@ message CorrelationClustererConfig {
       [default = NBHR_CLUSTER_MOVE];
   
   optional bool all_iter = 17;
+
+  optional bool permute = 18;
 }
 
 message KcoreConfig {

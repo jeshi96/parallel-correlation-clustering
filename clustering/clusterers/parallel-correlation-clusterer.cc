@@ -62,6 +62,53 @@ struct CorrelationClustererRefine {
   bool use_refine = false;
 };
 
+
+// Takes a vertexSubsetData (with some non-trivial Data) and applies a map
+// function f : (uintE x Data) -> void over each vertex in the vertexSubset, in
+// parallel.
+template <class F, class VS,
+          typename std::enable_if<!std::is_same<VS, gbbs::vertexSubset>::value,
+                                  int>::type = 0>
+inline void vertexMapPermute(VS& V, F f, size_t granularity=pbbslib::kSequentialForThreshold) {
+  size_t n = V.numRows(), m = V.numNonzeros();
+  if (V.dense()) {
+    auto P = pbbslib::random_permutation<gbbs::uintE>(n);
+    pbbs::parallel_for(0, n, [&] (size_t x) {
+      size_t i = P[x]; 
+      if (V.isIn(i)) {
+        f(i, V.ithData(i));
+      }
+    }, granularity);
+  } else {
+    auto P = pbbslib::random_permutation<gbbs::uintE>(m);
+    pbbs::parallel_for(0, m, [&] (size_t x) { size_t i = P[x]; f(V.vtx(i), V.vtxData(i)); }, granularity);
+  }
+}
+
+// Takes a vertexSubset (with no extra data per-vertex) and applies a map
+// function f : uintE -> void over each vertex in the vertexSubset, in
+// parallel.
+template <class VS, class F,
+          typename std::enable_if<std::is_same<VS, gbbs::vertexSubset>::value,
+                                  int>::type = 0>
+inline void vertexMapPermute(VS& V, F f, size_t granularity=pbbslib::kSequentialForThreshold) {
+  size_t n = V.numRows(), m = V.numNonzeros();
+  if (V.dense()) {
+    auto P = pbbslib::random_permutation<gbbs::uintE>(n);
+    pbbs::parallel_for(0, n, [&] (size_t x) {
+      size_t i = P[x];
+      if (V.isIn(i)) {
+        f(i);
+      }
+    }, granularity);
+  } else {
+    auto P = pbbslib::random_permutation<gbbs::uintE>(m);
+    pbbs::parallel_for(0, m, [&] (size_t x)
+                    { size_t i = P[x]; f(V.vtx(i)); }, granularity);
+  }
+}
+
+
 // Given a vertex subset moved_subset, computes best moves for all vertices
 // and performs the moves. Returns a vertex subset consisting of all vertices
 // adjacent to modified clusters.
@@ -71,6 +118,7 @@ BestMovesForVertexSubset(
     std::size_t num_nodes, gbbs::vertexSubset* moved_subset,
     ClusteringHelper* helper, const ClustererConfig& clusterer_config,
     CorrelationClustererSubclustering& subclustering) {
+  bool permute = clusterer_config.correlation_clusterer_config().permute();
   bool async = clusterer_config.correlation_clusterer_config().async();
   std::vector<absl::optional<ClusteringHelper::ClusterId>> moves(num_nodes,
                                                                  absl::nullopt);
@@ -81,7 +129,7 @@ BestMovesForVertexSubset(
   auto moved_clusters = absl::make_unique<bool[]>(current_graph->n);
   pbbs::parallel_for(0, current_graph->n,
                      [&](std::size_t i) { moved_clusters[i] = false; });
-  gbbs::vertexMap(*moved_subset, [&](std::size_t i) {
+  auto vertex_map_func = [&](std::size_t i) {
     if (async) {
       auto move = helper->AsyncMove(*current_graph, i);
       if (move) {
@@ -107,7 +155,9 @@ BestMovesForVertexSubset(
       moved_vertex[i] = 1;
     }
     }
-  });
+  };
+  if (permute) vertexMapPermute(*moved_subset, vertex_map_func);
+  else gbbs::vertexMap(*moved_subset, vertex_map_func);
 
   // Compute modified clusters
   if (!async) {
