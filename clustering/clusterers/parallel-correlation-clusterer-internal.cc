@@ -387,7 +387,7 @@ bool ClusteringHelper::AsyncMove(
     return true;
   }
 
-  std::size_t i = 0;
+  std::size_t i = moving_node;
   while(true) {
     if (cluster_sizes_[i] == 0) {
       if (pbbslib::CAS<ClusterId>(&cluster_sizes_[i], 0, 1)) {
@@ -427,7 +427,7 @@ bool ClusteringHelper::AsyncMove(
     });
     return true;
   }
-  std::size_t i = 0;
+  std::size_t i = curr_cluster_id;
   while(true) {
     if (cluster_sizes_[i] == 0) {
       if (pbbslib::CAS<ClusterId>(&cluster_sizes_[i], 0, moving_nodes.size())) {
