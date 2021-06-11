@@ -67,6 +67,9 @@ The options available in `CorrelationClustererConfig` are:
     * `ALL_MOVE`: all vertices
     * `NBHR_MOVE`: neighbors of vertices that have moved
 * `all_iter`: bool solely for the sequential implementations; indicates if the restriction on the number of iterations should be ignored and if the program should run to convergence
+*  `permute`: bool solely for the parallel implementations; indicates whether to 
+randomly permute vertices before performing best moves, which may improve performance
+when there is greater contention from the asynchronous setting
 
 ## Example Usage
 
@@ -79,3 +82,5 @@ A template command is:
 ```
 bazel run -c opt  //clustering:cluster-in-memory_main -- --input_graph=</path/to/graph> --output_clustering=</path/to/output> --clusterer_name=<clusterer name> --clusterer_config='<clusterer proto>'
 ```
+
+An example `<clusterer proto>` is `correlation_clusterer_config {resolution: 0.01, refine: true, async: true, move_method: NBHR_MOVE}`.
