@@ -84,3 +84,7 @@ bazel run -c opt  //clustering:cluster-in-memory_main -- --input_graph=</path/to
 ```
 
 An example `<clusterer proto>` is `correlation_clusterer_config {resolution: 0.01, refine: true, async: true, move_method: NBHR_MOVE}`.
+
+Paper
+--------
+The full version of the paper can be found [here](https://arxiv.org/abs/2108.01731).
