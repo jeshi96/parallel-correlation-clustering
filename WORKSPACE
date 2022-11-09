@@ -21,8 +21,9 @@ bind(
 
 http_archive(
     name = "com_google_absl",
-    strip_prefix = "abseil-cpp-master",
-    urls = ["https://github.com/abseil/abseil-cpp/archive/master.zip"],
+    strip_prefix = "abseil-cpp-20200923.1", #"abseil-cpp-master",
+    urls = ["https://github.com/abseil/abseil-cpp/archive/refs/tags/20200923.1.zip"],
+    #urls = ["https://github.com/abseil/abseil-cpp/archive/master.zip"],
 )
 
 git_repository(
